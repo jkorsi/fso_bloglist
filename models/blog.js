@@ -1,7 +1,5 @@
 const mongoose = require('mongoose')
-// mongoose.set('useFindAndModify', false)
-// mongoose.set('useCreateIndex', true);
-// const password = process.argv[2]
+const logger = require('../utils/logger')
 
 //-------------------------------
 //----------- SCHEMA ------------
@@ -21,16 +19,7 @@ module.exports = mongoose.model('Blog', blogSchema)
 //-------------------------------
 const mongoUrl = process.env.MONGODB_URI
 mongoose.connect(mongoUrl, {useNewUrlParser: true, useUnifiedTopology: true})
-
-
-
-
-
-
-
-
-
-
+logger.info('Connecting to: ', mongoUrl)
 
 
 //-------------------------------

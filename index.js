@@ -1,49 +1,16 @@
+const app = require('./app')
 const http = require('http')
-
-require('dotenv').config()
-
-const express = require('express')
-const app = express()
-const cors = require('cors')
-const Blog = require('./models/blog')
-
-app.use(cors())
-app.use(express.json())
-
+const config = require('./utils/config')
+const logger = require('./utils/logger')
 
 //-------------------------------
-//----------- GET ALL -----------
+//------------ SERVER -----------
 //-------------------------------
-app.get('/api/blogs', (request, response) =>
+
+//const PORT = process.env.PORT
+const server = http.createServer(app)
+
+server.listen(config.PORT, () =>
 {
-    Blog
-        .find({})
-        .then(blogs =>
-        {
-            response.json(blogs)
-        })
-})
-
-
-//-------------------------------
-//---------- POST ONE -----------
-//-------------------------------
-app.post('/api/blogs', (request, response) =>
-{
-    const blog = new Blog(request.body)
-    blog
-        .save()
-        .then(result =>
-        {
-            response.status(201).json(result)
-        })
-})
-
-//-------------------------------
-//------------ PORT -------------
-//-------------------------------
-const PORT = process.env.PORT
-app.listen(PORT, () =>
-{
-    console.log(`Server running on port ${PORT}`)
+    logger.info(`Server running on port ${config.PORT}`)
 }) 
