@@ -1,0 +1,31 @@
+{
+  "name": "fso_bloglist",
+  "version": "1.0.0",
+  "description": "Fullstack Open, Part 4",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"No tests\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jkorsi/fso_bloglist.git"
+  },
+  "author": "Juho Suni",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jkorsi/fso_bloglist/issues"
+  },
+  "homepage": "https://github.com/jkorsi/fso_bloglist#readme",
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "eslint": "^7.4.0",
+    "mongoose": "^5.9.21",
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
+  }
+}
