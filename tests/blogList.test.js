@@ -93,7 +93,7 @@ describe('favorite blog', () =>
     test('multipleBlogsToTest', () =>
     {
         const result = listHelper.favoriteBlog(listOfManyBlogs)
-        console.log('Result', result)
+        //console.log('Result', result)
         expect(result).toEqual({
             title: 'Canonical string reduction',
             author: 'Edsger W. Dijkstra',
@@ -124,7 +124,7 @@ describe('most blogs', () =>
     test('multipleBlogsToTest', () =>
     {
         const result = listHelper.mostBlogs(listOfManyBlogs)
-        console.log('TEST RESULT, mostBlogs, multiple:', result)
+        //console.log('TEST RESULT, mostBlogs, multiple:', result)
         expect(result).toEqual({
             author: 'Robert C. Martin',
             blogs: 3
@@ -134,7 +134,7 @@ describe('most blogs', () =>
     test('onlyOneBlog', () =>
     {
         const result = listHelper.mostBlogs(listOfOneBlog)
-        console.log('TEST RESULT, mostBlogs, single:', result)
+        //console.log('TEST RESULT, mostBlogs, single:', result)
         expect(result).toEqual({
             author: 'Edsger W. Dijkstra',
             blogs: 1
@@ -144,7 +144,7 @@ describe('most blogs', () =>
     test('emptyList', () =>
     {
         const result = listHelper.mostBlogs(listOfNoBlogs)
-        console.log('TEST RESULT, mostBlogs, no blogs:', result)
+        //console.log('TEST RESULT, mostBlogs, no blogs:', result)
         expect(result).toEqual('No blogs')
     })
 
@@ -155,7 +155,7 @@ describe('most likes', () =>
     test('multipleBlogsToTest', () =>
     {
         const result = listHelper.mostLikes(listOfManyBlogs)
-        console.log('TEST RESULT, mostLikes, multiple:', result)
+        //console.log('TEST RESULT, mostLikes, multiple:', result)
         expect(result).toEqual({
             author: 'Edsger W. Dijkstra',
             likes: 17
@@ -165,7 +165,7 @@ describe('most likes', () =>
     test('onlyOneBlog', () =>
     {
         const result = listHelper.mostLikes(listOfOneBlog)
-        console.log('TEST RESULT, mostLikes, single:', result)
+        //console.log('TEST RESULT, mostLikes, single:', result)
         expect(result).toEqual({
             author: 'Edsger W. Dijkstra',
             likes: 5
@@ -175,7 +175,7 @@ describe('most likes', () =>
     test('emptyList', () =>
     {
         const result = listHelper.mostLikes(listOfNoBlogs)
-        console.log('TEST RESULT, mostLikes, no blogs:', result)
+        //console.log('TEST RESULT, mostLikes, no blogs:', result)
         expect(result).toEqual('No blogs')
     })
 

@@ -3,7 +3,7 @@ const _ = require('lodash')
 //-----------------------------
 //----------- DUMMY -----------
 //-----------------------------
-const dummy = (blogs) =>
+const dummy = () =>
 {
     return 1
 }
@@ -57,7 +57,7 @@ const mostBlogs = (blogs) =>
         .groupBy('author')
         .map((uniqueBlogs, author) => ({author, blogs: uniqueBlogs.length}))
         .value()
-    console.log(blogsWithCounts)
+    //console.log(blogsWithCounts)
 
     return blogs.length === 0
         ? 'No blogs'
@@ -71,7 +71,7 @@ const mostLikes = (blogs) =>
         .groupBy('author')
         .map((blogsList, author) => ({author, likes: _.sumBy(blogsList, 'likes')}))
         .value()
-    console.log(blogsWithLikes)
+    //console.log(blogsWithLikes)
 
     return blogs.length === 0
         ? 'No blogs'
