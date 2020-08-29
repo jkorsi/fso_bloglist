@@ -2,48 +2,75 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('./testHelper')
-const blog = require('../models/blog')
 
 const api = supertest(app)
 const initialBlogs = helper.initialBlogs
+const bcrypt = require('bcrypt')
 
 //-------------------------------
 //---- INITIALIZE TEST BLOGS ----
 //-------------------------------
 beforeEach(async () => {
     await Blog.deleteMany({})
-    await blog.insertMany(initialBlogs)
-    // let blogToAdd
-    // for (var i = 0, len = initialBlogs.length; i < len; i++){
-    //     blogToAdd = new Blog(initialBlogs[i])
-    //     await blogToAdd.save()
-    // }
+    const blogs = await Blog.insertMany(initialBlogs)
+    await User.deleteMany({})
+    const passwordHash = await bcrypt.hash('btest', 10)
+    
+    const user = new User({
+        username: 'btest',
+        name:'blogtest',
+        passwordHash
+    })
+
+    const blogUser = await user.save()
+    //const userId = blogUser._id.toString()
+
+    //UPDATE Blogs to have the btest as user
+    await Blog.updateMany({}, {'$set': {'user': blogUser._id}})
+
+    //UPDATE User to have blogs
+    await User.findByIdAndUpdate(blogUser._id, {'$set': {'blogs': blogs.map(b => b._id)}})
 })
 
-test('get content type is correct', async () => {
+test('CORRECT CONTENT TYPE', async () =>
+{
+
     await api
         .get('/api/blogs')
         .expect(200)
         .expect('Content-Type', /application\/json/)
 })
 
-test('amount of blogs is correct', async () =>
+test('CORRECT BLOG AMOUNT', async () =>
 {
     const response = await api.get('/api/blogs')
     expect(response.body).toHaveLength(initialBlogs.length)
 })
 
-test('add a valid blog', async () => {
+test('ADD BLOG', async () =>
+{
     const newBlog = {
         title: 'New Blog',
         author: 'New Blogger',
         url: 'www.newblog.com',
         likes: 123
     }
+    const loginUser = {
+        username:'btest',
+        password:'btest'       
+    }
+    
+    const login = await api
+        .post('/api/login')
+        .send(loginUser)
+    
+    const token = login.body.token
 
     await api
         .post('/api/blogs')
+        .set('Authorization', 'bearer '+ token)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -54,7 +81,26 @@ test('add a valid blog', async () => {
     expect(titles).toContainEqual('New Blog')
 })
 
-test('id is defined', async () => {
+test('CANT\'T ADD BLOG WITHOUT TOKEN', async () =>
+{
+    const newBlog = {
+        title: 'New Blog',
+        author: 'New Blogger',
+        url: 'www.newblog.com',
+        likes: 123
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
+        //.expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    expect(response.body).toHaveLength(initialBlogs.length)
+})
+
+test('ID MUST BE DEFINED', async () => {
     const response = await api.get('/api/blogs')
     const blogs = response.body
     let blogToTest
@@ -64,7 +110,7 @@ test('id is defined', async () => {
     }
 })
 
-test('likes are defaulted to 0 if not set', async () =>
+test('LIKES DEFAULT 0', async () =>
 {
     await Blog.deleteMany({})
 
@@ -74,8 +120,20 @@ test('likes are defaulted to 0 if not set', async () =>
         url: 'www.annoyingblog.com',
     }
 
+    const loginUser = {
+        username: 'btest',
+        password: 'btest'
+    }
+
+    const login = await api
+        .post('/api/login')
+        .send(loginUser)
+    
+    const token = login.body.token
+
     await api
         .post('/api/blogs')
+        .set('Authorization', 'bearer ' + token)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -84,7 +142,7 @@ test('likes are defaulted to 0 if not set', async () =>
     expect(response.body[0].likes).toBe(0)
 })
 
-test('field title is required', async () =>
+test('TITLE REQUIRED', async () =>
 {
     await Blog.deleteMany({})
 
@@ -93,14 +151,26 @@ test('field title is required', async () =>
         url: 'www.annoyingblog.com',
     }
 
+    const loginUser = {
+        username: 'btest',
+        password: 'btest'
+    }
+
+    const login = await api
+        .post('/api/login')
+        .send(loginUser)
+
+    const token = login.body.token
+
     await api
         .post('/api/blogs')
+        .set('Authorization', 'bearer ' + token)
         .send(newBlog)
         .expect(400)
         //.expect('Content-Type', /application\/json/)
 })
 
-test('field url is required', async () =>
+test('URL REQUIRED', async () =>
 {
     await Blog.deleteMany({})
 
@@ -109,24 +179,49 @@ test('field url is required', async () =>
         author: 'Annoying Blogger',
     }
 
+    const loginUser = {
+        username: 'btest',
+        password: 'btest'
+    }
+
+    const login = await api
+        .post('/api/login')
+        .send(loginUser)
+
+    const token = login.body.token
+
     await api
         .post('/api/blogs')
+        .set('Authorization', 'bearer ' + token)
         .send(newBlog)
         .expect(400)
     //.expect('Content-Type', /application\/json/)
 })
 
-test('delete one blog', async () => {
+test('DELETE BLOG', async () => {
     const response = await api.get('/api/blogs')
     const blogs = response.body
     const blogToDelete = blogs[0]
     const idOfDeleted = blogToDelete.id
+
+    const loginUser = {
+        username: 'btest',
+        password: 'btest'
+    }
+
+    const login = await api
+        .post('/api/login')
+        .send(loginUser)
+
+    const token = login.body.token
+
     await api
         .delete('/api/blogs/' + idOfDeleted)
+        .set('Authorization', 'bearer ' + token)
         .expect(204)
 })
 
-test.only('add one like (modify one blog)', async () =>
+test('MODIFY ONE, ADD A LIKE', async () =>
 {
     const response = await api.get('/api/blogs')
     const blogs = response.body
@@ -142,11 +237,10 @@ test.only('add one like (modify one blog)', async () =>
         likes: blogToUpdate.likes + 1
     }
 
-    const updatedBlog = await api
+    await api
         .put('/api/blogs/' + originaId)
         .send(likedBlog)
         .expect(200)
-    console.log(updatedBlog)
 
     const res = await api.get('/api/blogs')
     expect(res.body[0].likes).toBe(blogToUpdate.likes + 1)
