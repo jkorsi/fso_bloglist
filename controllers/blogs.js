@@ -22,11 +22,13 @@ blogsRouter.post('/', async (request, response, next) =>
     const blog = new Blog(request.body)
     if (!request.token)
     {
+        console.log('Token missing')
         return response.status(401).json({error: 'Token required'})
     }
     const decodedToken = jwt.verify(request.token, process.env.SECRET)
     if (!decodedToken.id)
     {
+        console.log('Auth problem')
         return response.status(401).json({error: 'Authorization failed'})
     }
     
@@ -79,11 +81,15 @@ blogsRouter.delete('/:id', async (request, response, next) =>
 //-------------------------------
 blogsRouter.put('/:id', async (request, response, next) =>
 {
-    try{
+    try
+    {
+        console.log('Params:', request.params)
         const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, request.body)
         response.status(200).json(updatedBlog)
     }
-    catch (exception){
+    catch (exception)
+    {
+        console.log('Poikkeus', exception)
         response.status(400)
         next(exception)
     }
