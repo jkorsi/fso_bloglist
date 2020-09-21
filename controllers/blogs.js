@@ -6,7 +6,8 @@ const jwt = require('jsonwebtoken')
 //-------------------------------
 //-------- GET ALL BLOGS --------
 //-------------------------------
-blogsRouter.get('/', async (request, response) => {
+blogsRouter.get('/', async (request, response) =>
+{
     const blogs = await Blog
         .find({})
         .populate('user', {username: 1, name: 1})
@@ -18,7 +19,6 @@ blogsRouter.get('/', async (request, response) => {
 //-------------------------------
 blogsRouter.post('/', async (request, response, next) =>
 {
-    
     const blog = new Blog(request.body)
     if (!request.token)
     {
@@ -31,17 +31,18 @@ blogsRouter.post('/', async (request, response, next) =>
         console.log('Auth problem')
         return response.status(401).json({error: 'Authorization failed'})
     }
-    
-    
+
     const user = await User.findById(decodedToken.id)
     blog.user = user._id
-    
-    try {
+
+    try
+    {
         const blogToSave = await blog.save()
         user.blogs = user.blogs.concat(blogToSave._id)
         await user.save()
         response.status(201).json(blogToSave)
-    } catch(exception) {
+    } catch (exception)
+    {
         response.status(400)
         next(exception)
     }
@@ -65,8 +66,6 @@ blogsRouter.delete('/:id', async (request, response, next) =>
     try
     {
         const removedBlog = await Blog.findByIdAndDelete(request.params.id)
-        
-        console.log(removedBlog)
         response.status(204).json(removedBlog)
     }
     catch (exception)
@@ -83,17 +82,14 @@ blogsRouter.put('/:id', async (request, response, next) =>
 {
     try
     {
-        console.log('Params:', request.params)
         const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, request.body)
         response.status(200).json(updatedBlog)
     }
     catch (exception)
     {
-        console.log('Poikkeus', exception)
         response.status(400)
         next(exception)
     }
 })
-
 
 module.exports = blogsRouter

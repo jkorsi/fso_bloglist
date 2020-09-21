@@ -21,12 +21,13 @@ usersRouter.post('/', async (request, response, next) =>
         name: body.name,
         passwordHash,
     })
-    
 
-    try {
+    try
+    {
         const savedUser = await user.save()
         response.status(201).json(savedUser)
-    } catch (exception) {
+    } catch (exception)
+    {
         response.status(400)
         next(exception)
     }
